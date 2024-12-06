@@ -21,7 +21,7 @@ from sqlalchemy_utils import (
 )
 
 from .base import Base
-
+from .client import Client
 if TYPE_CHECKING:
     from .client import Client
 
@@ -30,16 +30,14 @@ class Contact(Base):
     """
     Модель для хранения контактной информации клиента.
 
-    :param client_id: Идентификатор клиента, которому принадлежит контакт.
-    :type client_id: int
-    :param phone_number: Телефонный номер клиента.
-    :type phone_number: sqlalchemy_utils.types.PhoneNumberType
-    :param email: Адрес электронной почты клиента.
-    :type email: sqlalchemy_utils.types.EmailType
-    :param facebook: Ссылка на профиль клиента в Facebook (необязательное поле).
-    :type facebook: Optional[str]
-    :param vk: Ссылка на профиль клиента в VK (необязательное поле).
-    :type vk: Optional[str]
+Attributes:
+        id (int): Уникальный идентификатор контакта.
+        client_id (int): Идентификатор клиента, которому принадлежит контакт.
+        phone_number (sqlalchemy_utils.types.PhoneNumberType): Телефонный номер клиента.
+        email (sqlalchemy_utils.types.EmailType): Адрес электронной почты клиента.
+        facebook (Optional[str]): Ссылка на профиль клиента в Facebook (необязательное поле).
+        vk (Optional[str]): Ссылка на профиль клиента в VK (необязательное поле).
+        client (Client): Связь с объектом клиента
     """
 
     client_id: Mapped[int] = mapped_column(
@@ -61,3 +59,18 @@ class Contact(Base):
     vk: Mapped[Optional[str]] = mapped_column(String(30), nullable=True, default=None)
 
     client: Mapped[Client] = relationship(back_populates="contacts")
+
+    def __str__(self) -> str:
+        """Возвращает строковое представление объекта."""
+        return (f"{self.__class__.__name__}("
+        f"id={self.id},"
+        f"client_id={self.client_id},"
+        f"phone_number={self.phone_number},"
+        f"email={self.email},"
+        f"facebook={self.facebook!r},"
+        f"vk={self.vk!r})"
+        )
+
+    def __repr__(self) -> str:
+        """Возвращает строковое представление объекта для отображения в интерпретаторе."""
+        return str(self)

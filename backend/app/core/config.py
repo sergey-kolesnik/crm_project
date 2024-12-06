@@ -1,13 +1,20 @@
+import os
+
 from pydantic import (
     BaseModel,
-    PostgresDsn,
+    PostgresDsn
+
 )
+
+from dotenv import load_dotenv
+
 
 from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
 )
 
+load_dotenv()
 
 class DataBaseConfig(BaseModel):
     """Конфигурация подключения к базе данных PostgreSQL.
@@ -19,12 +26,13 @@ class DataBaseConfig(BaseModel):
         pool_size (int): Размер пула соединений. По умолчанию: 50.
         max_overflow (int): Максимальное количество дополнительных соединений сверх размера пула. По умолчанию: 10.
     """
-
     url: PostgresDsn
-    echo: bool = True
-    echo_pool: bool = False
-    pool_size: int = 50
-    max_overflow: int = 10
+    # db_url: str
+    # echo: bool = True
+    # echo_pool: bool = False
+    # pool_size: int = 50
+    # max_overflow: int = 10
+
 
 
 class Settings(BaseSettings):
@@ -38,13 +46,17 @@ class Settings(BaseSettings):
             Определяет файл конфигурации (.env), а также чувствительность к регистру имен параметров.
         db (DataBaseConfig): Конфигурация подключения к базе данных.
     """
-
     model_config = SettingsConfigDict(
-        env_file=".env",
-        case_sensitive=False,
+    env_file="../.env",
+    case_sensitive=False,
+    env_nested_delimiter="__",
+    env_prefix="APP_CONFIG__"
     )
+
 
     db: DataBaseConfig
 
 
+
 settings = Settings()
+print(settings)

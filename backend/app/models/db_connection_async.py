@@ -29,7 +29,7 @@ class DataBaseConnect:
     ) -> None:
         """Инициализация класса DataBaseConnect.
 
-        Args:
+        Attributes:
             url (str): URL подключения к базе данных.
             echo (bool, optional): Включает логирование SQL-запросов. По умолчанию: True.
             echo_pool (bool, optional): Включает логирование событий пула соединений. По умолчанию: False.
