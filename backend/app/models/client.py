@@ -7,12 +7,14 @@ import datetime
 
 from sqlalchemy import (
     String,
-    Date,
+    DateTime,
+    func,
 )
 from sqlalchemy.orm import (
     mapped_column,
     Mapped,
     relationship,
+    
 )
 
 from .base import Base
@@ -40,9 +42,9 @@ class Client(Base):
     middle_name: Mapped[Optional[str]] = mapped_column(
         String(30), nullable=True, default=None
     )
-    create_at_day: Mapped[datetime.datetime] = mapped_column(Date, nullable=False)
+    create_at_day: Mapped[datetime.datetime] = mapped_column(DateTime, default=func.now(), nullable=False)
     update_at_day: Mapped[Optional[datetime.datetime]] = mapped_column(
-        Date, nullable=True, default=None
+        DateTime, nullable=True, default=None
     )
 
     contacts: Mapped[List["Contact"]] = relationship(back_populates="client")
@@ -62,3 +64,4 @@ class Client(Base):
     def __repr__(self) -> str:
         """Возвращает строковое представление объекта для отображения в интерпретаторе."""
         return str(self)
+    

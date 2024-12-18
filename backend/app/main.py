@@ -17,8 +17,7 @@ async def lifespan(app: FastAPI):
 
 # app.add_middleware(CORSMiddleware, allow_origins=['*'])
 app = FastAPI(
-    lifespan=lifespan,
-    default_response_class=ORJSONResponse,
+    lifespan=lifespan,  
 )
 
 app.include_router(client_router)
