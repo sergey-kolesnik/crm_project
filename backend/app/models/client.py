@@ -40,23 +40,23 @@ class Client(Base):
     middle_name: Mapped[Optional[str]] = mapped_column(
         String(30), nullable=True, default=None
     )
-    create_at_day: Mapped[datetime.time] = mapped_column(Date, nullable=False)
-    update_at_day: Mapped[Optional[datetime.time]] = mapped_column(
+    create_at_day: Mapped[datetime.datetime] = mapped_column(Date, nullable=False)
+    update_at_day: Mapped[Optional[datetime.datetime]] = mapped_column(
         Date, nullable=True, default=None
     )
 
     contacts: Mapped[List["Contact"]] = relationship(back_populates="client")
 
-
     def __str__(self) -> str:
         """Возвращает строковое представление объекта."""
-        return (f"{self.__class__.__name__}("
-        f"id={self.id},"
-        f"name={self.name!r},"
-        f"sur_name={self.sur_name!r},"
-        f"middle_name={self.middle_name!r},"
-        f"create_at_day={self.create_at_day!r},"
-        f"update_at_day={self.update_at_day!r})"
+        return (
+            f"{self.__class__.__name__}("
+            f"id={self.id},"
+            f"name={self.name!r},"
+            f"sur_name={self.sur_name!r},"
+            f"middle_name={self.middle_name!r},"
+            f"create_at_day={self.create_at_day!r},"
+            f"update_at_day={self.update_at_day!r})"
         )
 
     def __repr__(self) -> str:

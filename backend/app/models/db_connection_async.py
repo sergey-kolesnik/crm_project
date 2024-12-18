@@ -7,6 +7,8 @@ from sqlalchemy.ext.asyncio import (
     AsyncSession,
 )
 
+from core import settings
+
 
 class DataBaseConnect:
     """Класс для управления подключениями к базе данных.
@@ -55,7 +57,8 @@ class DataBaseConnect:
 
         Данный метод завершает все активные соединения и освобождает ресурсы, используемые движком базы данных.
         """
-        await self.engine.dispose()
+        if self.engine:
+            await self.engine.dispose()
 
     async def session_get(self) -> AsyncGenerator[AsyncSession, None]:
         """Получение асинхронной сессии из фабрики сессий.
@@ -66,3 +69,13 @@ class DataBaseConnect:
             AsyncSession: Асинхронная сессия базы данных."""
         async with self.session_factory() as session:
             yield session
+
+
+db_async_session = DataBaseConnect(
+    url=str(settings.db.url),
+    echo=settings.db.echo,
+    echo_pool=settings.db.echo_pool,
+    pool_size=settings.db.pool_size,
+    max_overflow=settings.db.max_overflow
+
+)
