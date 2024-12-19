@@ -47,7 +47,7 @@ class Client(Base):
         DateTime, nullable=True, default=None
     )
 
-    contacts: Mapped[List["Contact"]] = relationship(back_populates="client")
+    contacts: Mapped["Contact"] = relationship(back_populates="client")
 
     def __str__(self) -> str:
         """Возвращает строковое представление объекта."""

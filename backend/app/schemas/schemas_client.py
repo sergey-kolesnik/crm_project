@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 
 
-from .schemas_contact import ContactOutput
+from .schemas_contact import ContactOut
 
 class ClientBase(BaseModel):
     """
@@ -27,18 +27,18 @@ class ClientBase(BaseModel):
 
     name: str
     sur_name: str
-    middle_name: Optional[str]
+    middle_name: Optional[str] = None
     create_at_day: datetime.datetime
-    update_at_day: Optional[datetime.datetime]
-    contacts: ContactOutput
+    update_at_day: Optional[datetime.datetime] = None
+    contacts: ContactOut
 
 
     class Config:
-        orm_mode = True
+        from_attributes = True
         arbitrary_types_allowed = True
 
 
-class ClientOutput(ClientBase):
+class ClientOut(ClientBase):
     """
     Модель для вывода информации о клиенте.
 

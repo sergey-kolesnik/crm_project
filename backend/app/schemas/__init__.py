@@ -1,11 +1,11 @@
 __all__ = (
-    "ClientOutput",
-    "ContactOutput"
+    "ClientOut",
+    "ContactOut"
     )
 
 
 from .schemas_client import (
-    ClientOutput,
+    ClientOut,
 )
 
-from .schemas_contact import ContactOutput
+from .schemas_contact import ContactOut
