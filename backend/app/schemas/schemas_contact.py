@@ -1,20 +1,23 @@
 
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import (
+    BaseModel,
+    Field,
+    )
 
 
 class ContactBase(BaseModel):
     """
-Базовый класс контакта.
+    Базовый класс контакта.
 
-Attributes:
-    phone_number (str): Номер телефона.
-    email (str): Электронная почта.
-    facebook (Optional[str]): Ссылка на профиль Facebook.
-    vk (Optional[str]): Ссылка на профиль ВКонтакте.
-"""
-    client_id: int
+    Attributes:
+        phone_number (str): Номер телефона.
+        email (str): Электронная почта.
+        facebook (Optional[str]): Ссылка на профиль Facebook.
+        vk (Optional[str]): Ссылка на профиль ВКонтакте.
+    """
+
     phone_number: str
     email: str
     facebook: Optional[str] = None
@@ -26,8 +29,23 @@ Attributes:
 
 
 class ContactOut(ContactBase):
-    """Класс вывода данных контакта.
+    """
+    Класс вывода данных контакта.
 
-Наследует все атрибуты от базового класса ContactBase.
-"""
+    Attributes:
+        phone_number (str): Номер телефона.
+        email (str): Электронная почта.
+        facebook (Optional[str]): Ссылка на профиль Facebook.
+        vk (Optional[str]): Ссылка на профиль ВКонтакте.
+        client_id (int): id клиента.
+    """
+    client_id: int
+
+
+class ContactIn(ContactBase):
+    """
+    Класс ввода данных контакта.
+
+    Наследует все атрибуты от базового класса ContactBase.
+    """
     pass

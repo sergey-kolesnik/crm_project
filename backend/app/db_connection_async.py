@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import (
     AsyncSession,
 )
 
-from core import settings
 
+from core import settings
 
 class DataBaseConnect:
     """Класс для управления подключениями к базе данных.
@@ -19,6 +19,14 @@ class DataBaseConnect:
     Attributes:
         engine (AsyncEngine): Асинхронный движок базы данных.
         session_factory (async_sessionmaker[AsyncSession]): Фабрика сессий для создания асинхронных сессий.
+
+    Args:
+        url (str): URL для подключения к базе данных.
+        echo (bool): Включает/выключает вывод SQL-запросов в консоль.
+        echo_pool (bool): Включает/выключает вывод информации о пуле соединений.
+        pool_size (int): Размер пула соединений.
+        max_overflow (int): Максимальное количество соединений, которое может выйти за пределы пула.
+
     """
 
     def __init__(

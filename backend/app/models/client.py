@@ -42,12 +42,10 @@ class Client(Base):
     middle_name: Mapped[Optional[str]] = mapped_column(
         String(30), nullable=True, default=None
     )
-    create_at_day: Mapped[datetime.datetime] = mapped_column(DateTime, default=func.now(), nullable=False)
-    update_at_day: Mapped[Optional[datetime.datetime]] = mapped_column(
-        DateTime, nullable=True, default=None
-    )
+    create_at_day: Mapped[datetime.datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    update_at_day: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime, nullable=True)
 
-    contacts: Mapped["Contact"] = relationship(back_populates="client")
+    contacts: Mapped["Contact"] = relationship(back_populates="client",  uselist=False, lazy="joined")
 
     def __str__(self) -> str:
         """Возвращает строковое представление объекта."""

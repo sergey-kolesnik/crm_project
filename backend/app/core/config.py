@@ -1,5 +1,3 @@
-# import os
-
 from pydantic import BaseModel, PostgresDsn
 
 from dotenv import load_dotenv

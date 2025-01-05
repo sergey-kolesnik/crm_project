@@ -5,29 +5,42 @@ from typing import (
 
 from fastapi import (
     APIRouter, 
-    Depends
+    Depends,
+    Form,
     )
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from schemas import ClientOut
+from schemas import (
+    ClientOut,
+    ClientIn)
 
-from crud import get_all_clients
+from crud import fetch_all_clients, create_client_record
 
-from models import db_async_session
+from db_connection_async import db_async_session
 
 router = APIRouter(
     prefix="/clients",
+    tags=["clients"],
                    )
 
 
-@router.get("/", response_model=List[ClientOut])
-async def get_clients(
+@router.get("/", response_model=List[ClientOut], tags=["clients"])
+async def get_all_clients(
     session: Annotated[
         AsyncSession,
         Depends(db_async_session.session_get)
     ],
-):
-    all_clients = await get_all_clients(session=session)
+  ):
+    all_clients = await fetch_all_clients(session=session)
 
     return all_clients
+
+
+@router.post("/", tags=["clients"])
+async def create_client(
+    session: Annotated[AsyncSession, Depends(db_async_session.session_get)], 
+                       data: ClientIn
+):
+    new_client = await create_client_record(session=session, new_client_data=data)
+    return new_client

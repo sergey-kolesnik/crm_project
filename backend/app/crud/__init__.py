@@ -1,5 +1,6 @@
 __all__ = (
-    "get_all_clients",
+    "fetch_all_clients",
+    "create_client"
 )
 
-from .crud_clients import get_all_clients
+from .crud_clients import fetch_all_clients, create_client_record
