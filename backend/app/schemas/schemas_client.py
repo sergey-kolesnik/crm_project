@@ -1,7 +1,8 @@
 from typing import (
     Optional,
     List,
-    TYPE_CHECKING
+    TYPE_CHECKING,
+    Union
 )
 
 import datetime
@@ -13,6 +14,7 @@ from pydantic import BaseModel
 from .schemas_contact import (
     ContactOut,
     ContactIn,
+    ContactUpdate,
     )
 
 class ClientBase(BaseModel):
@@ -21,17 +23,14 @@ class ClientBase(BaseModel):
 
     Attributes:
         name (str): Имя клиента.
-        surname (str): Фамилия клиента.
-        patronymic (Optional[str]): Отчество клиента.
-        created_at (time): Дата и время создания записи.
-        updated_at (Optional[time]): Дата и время последнего обновления записи.
-        contacts (List[Contact]): Список контактов клиента.
+        sur_name (str): Фамилия клиента.
+        middle_name (Optional[str]): Отчество клиента.
+        contacts (ContactOut): Информация о контактах клиента
     """
 
     name: str
     sur_name: str
-    middle_name: Optional[str] = None
-    
+    middle_name: Optional[str] = None 
     contacts: ContactOut
 
 
@@ -47,11 +46,11 @@ class ClientOut(ClientBase):
     Attributes:
         id (int): Уникальный идентификатор клиента.
         name (str): Имя клиента.
-        surname (str): Фамилия клиента.
-        patronymic (Optional[str]): Отчество клиента.
-        created_at (time): Дата и время создания записи.
-        updated_at (Optional[time]): Дата и время последнего обновления записи.
-        contacts (List[Contact]): Список контактов клиента.
+        sur_name (str): Фамилия клиента.
+        middle_name (Optional[str]): Отчество клиента.
+        create_at_day (datetime.datetime): Дата и время создания записи.
+        update_at_day (Optional[datetime.datetime]): Дата и время последнего обновления записи.
+        contacts (ContactOut): Информация о контактах клиента
     """
 
     id: int
@@ -59,6 +58,21 @@ class ClientOut(ClientBase):
     update_at_day: Optional[datetime.datetime] = None
 
 class ClientIn(ClientBase):
+    """
+    Модель для ввода информации о клиенте.
+
+    Attributes:
+        name (str): Имя клиента.
+        sur_name (str): Фамилия клиента.
+        middle_name (Optional[str]): Отчество клиента.
+        contacts (ContactIn): Информация о контактах клиента
+    """
     contacts: ContactIn
+
+
+class ClientUpdate(ClientBase):
+    name: Optional[str] = None
+    sur_name: Optional[str] = None
+    contacts: Union[ContactUpdate, None] = None
 
 

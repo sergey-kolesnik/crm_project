@@ -10,6 +10,7 @@ from models import Client, Contact
 from schemas import (
     ClientOut,
     ClientIn,
+    ClientUpdate,
 )
 
 
@@ -66,3 +67,60 @@ async def create_client_record(
     await session.refresh(client)
 
     return client
+
+
+
+async def update_client_record(session: AsyncSession,
+                               client_id: int,
+                               new_client_data: ClientUpdate):
+    """Обновляет запись о клиенте и связанные с ним контакты в базе данных.
+
+Args:
+    session: Асинхронная сессия SQLAlchemy.
+    client_id: ID клиента, данные которого нужно обновить.
+    new_client_data: Объект ClientUpdate, содержащий новые данные клиента.
+
+Returns:
+        Объект Client, представляющий обновленного клиента.
+
+Raises:
+    ValueError: Если клиент с указанным ID не найден.
+"""
+    client = await session.get(Client, client_id)
+
+    if not client:
+        raise ValueError(f"Клиент с id {client_id} не найден")
+
+
+    update_data = new_client_data.model_dump(exclude_none=True, exclude={"contacts"})
+
+    for key, value in update_data.items():
+        setattr(client, key, value)
+
+    await session.commit()
+    await session.refresh(client)
+
+    if new_client_data.contacts:
+        contact = await session.scalar(select(Contact).where(Contact.client_id == client_id))
+
+        if contact:
+            contact_data = new_client_data.contacts.model_dump(exclude_none=True)
+            for key, value in contact_data.items():
+                setattr(contact, key, value)
+        session.add(contact)
+    await session.commit()
+    return client
+
+
+
+
+async def delete_client_record(session: AsyncSession, client_id: int) -> None:
+    client = await session.get(Client, client_id)
+
+    if not client:
+        raise ValueError(f"Клиент с id {client_id} не найден")
+    
+    await session.delete(client)
+    await session.commit()
+
+

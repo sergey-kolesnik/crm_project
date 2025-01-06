@@ -45,7 +45,7 @@ class Client(Base):
     create_at_day: Mapped[datetime.datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
     update_at_day: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime, nullable=True)
 
-    contacts: Mapped["Contact"] = relationship(back_populates="client",  uselist=False, lazy="joined")
+    contacts: Mapped["Contact"] = relationship(back_populates="client",  uselist=False, lazy="joined", cascade="all, delete-orphan")
 
     def __str__(self) -> str:
         """Возвращает строковое представление объекта."""
