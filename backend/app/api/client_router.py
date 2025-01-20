@@ -6,10 +6,14 @@ from typing import (
 from fastapi import (
     APIRouter, 
     Depends,
-    Form,
+    HTTPException,
+    status,
     )
 
+
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from sqlalchemy.exc import IntegrityError
 
 from schemas import (
     ClientOut,
@@ -23,6 +27,12 @@ from crud import (fetch_all_clients,
                   )
 
 from db_connection_async import db_async_session
+from core import (
+    DatabaseError,
+    UniqueViolationError,
+    NotFoundError,
+    crm_logger,
+    )
 
 router = APIRouter(
     prefix="/clients",
@@ -30,29 +40,64 @@ router = APIRouter(
                    )
 
 
-@router.get("/", response_model=List[ClientOut], tags=["clients"])
+@router.get("/", response_model=List[ClientOut], tags=["clients"], status_code=200)
 async def get_all_clients(
     session: Annotated[
         AsyncSession,
         Depends(db_async_session.session_get)
     ],
   ):
-    all_clients = await fetch_all_clients(session=session)
+    """
+    Получает всех клиентов из базы данных.
+    
+    Returns:
+        List[ClientOut]: Список всех клиентов.
 
-    return all_clients
+    Raises:
+        DatabaseError: Если произошла ошибка при работе с базой данных.
+    """
+    try:
+        all_clients = await fetch_all_clients(session=session)
 
-
-@router.post("/", tags=["clients"], response_model=ClientOut)
+        return all_clients
+    except ConnectionRefusedError as error:
+        crm_logger.error(f"Ошибка подключения к бд {error}")
+        raise DatabaseError(detail="Ошибка сервера")
+   
+@router.post("/", tags=["clients"], response_model=ClientOut, status_code=201)
 async def create_client(
     session: Annotated[AsyncSession, Depends(db_async_session.session_get)], 
                        data: ClientIn
 ):
-    new_client = await create_client_record(session=session, new_client_data=data)
-    return new_client
+    """
+    Создает нового клиента в базе данных.
+
+    Args:
+        session: Асинхронная сессия SQLAlchemy.
+        Данные нового клиента.
+
+    Returns:
+        ClientOut: Данные созданного клиента.
+
+    Raises:
+       UniqueViolationError: Если email клиента не уникальный.
+        DatabaseError: Если произошла ошибка при работе с базой данных.
+        Exception: Если произошла неизвестная ошибка.
+    """
+    try:
+        new_client = await create_client_record(session=session, new_client_data=data)
+        crm_logger.debug(f"Клиент создан успешно, id клиента: {new_client.id}")
+        return new_client
+    except ConnectionRefusedError as error:
+      crm_logger.error(f"Ошибка подключения к бд {error}")
+      raise DatabaseError(detail="Ошибка сервера")
+    except IntegrityError as error:
+        crm_logger.error(f"Ошибка при создании клиента, уникальное поле: {error}")
+        raise UniqueViolationError(f"Ошибка при создании клиента, уникальное поле: {error}")
 
 
 
-@router.patch("/{client_id}")
+@router.patch("/{client_id}", tags=["clients"], status_code=200)
 async def update_client(
     client_id: int,
     session: Annotated[AsyncSession, Depends(db_async_session.session_get)],
@@ -72,16 +117,50 @@ async def update_client(
         Объект ClientOut, содержащий обновленные данные клиента.
 
     Raises:
-        HTTPException 404: Если клиент с указанным ID не найден.
-        HTTPException 400: Если произошла ошибка при обновлении данных.
+        NotFoundError: Если клиент с указанным ID не найден.
+        UniqueViolationError: Если email клиента не уникальный.
+        DatabaseError: Если произошла ошибка при работе с базой данных.
+
     """
-    update_client = await update_client_record(session=session, new_client_data=data, client_id=client_id)
-    return update_client
+    try:
+        update_client = await update_client_record(session=session, new_client_data=data, client_id=client_id)
+        crm_logger.debug(f"Клиент с id={client_id} успешно обновлён.")
+        return update_client
+    except ConnectionRefusedError as error:
+        crm_logger.error(f"Ошибка подключения к бд {error}")
+        raise DatabaseError(detail="Ошибка сервера")
+    except ValueError as error:
+        crm_logger.error(f"Ошибка при обновлении клиента {error}")
+        raise NotFoundError(f"Клиент с id={client_id} не найден")
+    except IntegrityError as error:
+        crm_logger.error(f"Ошибка при обновлении клиента, уникальное поле: {error}")
+        raise UniqueViolationError(f"Ошибка при обновлении клиента, уникальное поле: {error}")
 
 
-@router.delete("/{client_id}")
+
+@router.delete("/{client_id}", tags=["clients"], status_code=204)
 async def delete_client(client_id: int, 
                         session: Annotated[AsyncSession, Depends(db_async_session.session_get)]):
-    
-    await delete_client_record(session=session, client_id=client_id)
-    return "ok"
+    """
+     Удаляет клиента из базы данных по ID.
+
+    Args:
+        client_id: ID клиента, которого нужно удалить.
+        session: Асинхронная сессия SQLAlchemy.
+
+    Returns:
+        None: Возвращает пустой ответ с кодом 204.
+
+    Raises:
+       NotFoundError: Если клиент с указанным ID не найден.
+       DatabaseError: Если произошла ошибка при работе с базой данных.
+    """
+    try:
+        await delete_client_record(session=session, client_id=client_id)
+        crm_logger.debug(f"Клиент с id={client_id} успешно удален")
+    except ConnectionRefusedError as error:
+        crm_logger.error(f"Ошибка подключения к бд {error}")
+        raise DatabaseError(detail="Ошибка сервера")
+    except ValueError as error:
+        crm_logger.error(f"Ошибка при обновлении клиента {error}")
+        raise NotFoundError(f"Клиент с id={client_id} не найден")

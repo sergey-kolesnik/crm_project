@@ -1,8 +1,8 @@
 from typing import List
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import select, Result
-from sqlalchemy.orm import joinedload
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import Client, Contact
@@ -13,6 +13,9 @@ from schemas import (
     ClientUpdate,
 )
 
+from core import (
+    DatabaseError,
+)
 
 async def fetch_all_clients(
     session: AsyncSession,
@@ -93,6 +96,7 @@ Raises:
 
 
     update_data = new_client_data.model_dump(exclude_none=True, exclude={"contacts"})
+    update_data['update_at_day'] = datetime.now()
 
     for key, value in update_data.items():
         setattr(client, key, value)

@@ -4,6 +4,10 @@ __all__ = (
     "description",
     "version",
     "title",
+    "DatabaseError",
+    "UniqueViolationError",
+    "NotFoundError",
+    "crm_logger",
 
     )
 
@@ -16,3 +20,9 @@ from .metadata import (
     title,
 )
 
+from .custom_exceptions import (
+    DatabaseError,
+    UniqueViolationError,
+    NotFoundError
+    )
+from .logger import crm_logger
